@@ -11,20 +11,20 @@ import java.util.Enumeration;
 
 @WebServlet(value = "/time")
 public class TimeServlet extends HttpServlet {
-    private String timeInit;
-
-    protected void setTimeZone(String timeZone){
+    protected static String setTimeZone(String timeZone){
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss z").withZone(ZoneId.of(timeZone));
-        timeInit = dateFormat.format(new Date().toInstant());
+        return dateFormat.format(new Date().toInstant());
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Enumeration<String> values = req.getParameterNames();
-        if(values.hasMoreElements()){
-            setTimeZone(req.getParameter("timezone").replace(" ", "+"));
+        String timeInit;
+        String timezone = req.getParameter("timezone");
+
+        if(timezone == null || timezone.isBlank()){
+            timeInit = setTimeZone("UTC");
         }else{
-            setTimeZone("UTC");
+            timeInit = setTimeZone(req.getParameter("timezone").replace(" ", "+"));
         }
         resp.setContentType("text/html; charset=utf-8");
         resp.getWriter().write("<h1>Поточний час:</h1>");
@@ -32,8 +32,4 @@ public class TimeServlet extends HttpServlet {
         resp.getWriter().close();
     }
 
-    @Override
-    public void destroy(){
-        timeInit = null;
-    }
 }

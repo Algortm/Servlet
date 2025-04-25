@@ -13,12 +13,11 @@ import java.util.Enumeration;
 
 @WebFilter(value = "/time")
 public class TimezoneValidateFilter  extends HttpFilter {
-
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws ServletException, IOException {
-        Enumeration<String> values = req.getParameterNames();
+        String timezone = req.getParameter("timezone");
 
-        if(!values.hasMoreElements() || isValidTimezone(req.getParameter("timezone").replace(" ", "+"))){
+        if(timezone == null || timezone.isBlank() || isValidTimezone(req.getParameter("timezone").replace(" ", "+"))){
             chain.doFilter(req, resp);
         }else{
             resp.setStatus(400);
